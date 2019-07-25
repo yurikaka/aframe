@@ -14,7 +14,77 @@
   -->
   <script src="https://aframe.io/releases/0.7.1/aframe.min.js"></script>
   <script type="text/javascript" src="https://cdn.webrtc.ecl.ntt.com/skyway-latest.js"></script>
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
   <script>
+    
+
+    window.onload = function start() {
+      
+    slide();
+  }
+  
+  function slide() {
+      var num = 0;
+    window.setInterval(function () {
+      let gamepads = window.navigator.getGamepads();
+      for (let i = 0; i < gamepads.length; ++i) {
+        let gamepad = gamepads[i];
+        if (gamepad != null) {
+          var left = 0;
+          var right = 0;
+          var sent = 0;
+          for (var j = 0; j < gamepad.axes.length; ++j) {
+            switch (j % 3) {
+              case 0:
+                if (gamepad.axes[j] < 0) {
+                  left = 1;
+                }
+                else if (gamepad.axes[j] > 0) {
+                  right = 1;
+                }
+                break;
+              case 1:
+                break;
+              case 2:
+                break;
+            }
+          }
+
+
+          for (var j = 0; j < gamepad.buttons.length; ++j) {
+            var touched = 0;
+            if (gamepad.buttons[j].touched) {
+              touched = 1;
+
+            }
+
+            if (j == 0 && (gamepad.buttons[j].pressed || touched)) {
+
+              if (left && gamepad.buttons[j].value > 0.5) {
+                $.get('http://10.105.120.225:8098/left');
+                sent = 1;
+              };
+              if (right && gamepad.buttons[j].value > 0.5) {
+                $.get('http://10.105.120.225:8098/right');
+                sent = 1;
+              };
+            }
+            else if (j == 1 && (gamepad.buttons[j].pressed || touched)) {
+
+              $.get('http://10.105.120.225:8098/forward');
+              sent = 1;
+            }
+          }
+
+          if (sent == 0) {
+            $.get('http://10.105.120.10:8098/stop');
+          }
+        }
+      }
+ 
+    }, 100); // repeat forever, polling every 0.1 seconds
+  }
+
     function _assert(desc, v) {
       if (v) {
         return;
@@ -48,7 +118,7 @@
   </script>
   <script type="text/javascript">
   // ----- use skyway room ----
-  let myApiKey = '4ff0a85b-4015-4e8b-94f6-4fab24c759e0'; //null; // set your API key
+  let myApiKey = '038eeec7-6cf3-4209-bc02-af5a6f873780'; //null; // set your API key
   let peer = null;
   let meshRoom = null;
   const defaultRoomName = '_oculusgo_test_room';
